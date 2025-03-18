@@ -75,10 +75,13 @@ let lastkey = ''
 
 
     const map = [
-        ['-', '-','-', '-','-', '-'],
-        ['-', '-','-', '-','-', '-'],
-        ['-', '-','-', '-','-', '-'],
-        ['-', '-','-', '-','-', '-']
+    ['-', '-', '-', '-', '-', '-','-'],
+    ['-', ' ', ' ', ' ', ' ', ' ','-'],
+    ['-', ' ', '-', ' ', '-', ' ','-'],
+    ['-', ' ', ' ', ' ', ' ', ' ','-'],
+    ['-', ' ', '-', ' ', '-', ' ','-'],
+    ['-', ' ', ' ', ' ', ' ', ' ','-'],
+    ['-', '-', '-', '-', '-', '-','-']
         ]
 
 map.forEach((row, i) => {
@@ -96,25 +99,127 @@ map.forEach((row, i) => {
     }
 })
 })
+
+function circleCollidesWithRectangle({
+    circle,
+    rectangle
+}) {
+    return (
+        circle.position.x - circle.radius + circle.velocity.y
+        <= 
+        rectangle.position.y + rectangle.height && 
+        circle.position.x + circle.radius +circle.velocity.x 
+        >= 
+        rectangle.position.x && 
+        circle.position.y + circle.radius +circle.velocity.y 
+        >= 
+        rectangle.position.y
+        && circle.position.x - circle.radius +circle.velocity.x 
+         <=
+         rectangle.position.x + rectangle.width)
+}
+
 function animate () {
     requestAnimationFrame(animate)
     c.clearRect(0, 0, canvas.width, canvas.height)
+
+    if (keys.w.pressed && lastkey === 'w') {
+       for (let i = 0; i < boundaries.length; i++) {
+        const boundary = boundaries[i]
+        if (
+            circleCollidesWithRectangle({
+            circle: {
+                ...player, 
+                velocity: {
+                x: 0,
+                y: -5
+            }},
+            rectangle: boundary
+        }) ) {
+            player.velocity.y = 0
+            break
+        } else {
+            player.velocity.y = -5
+        }
+    }
+    } else if (keys.a.pressed && lastkey === 'a') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i]
+            if (
+                circleCollidesWithRectangle({
+                circle: {
+                    ...player, 
+                    velocity: {
+                    x: -5,
+                    y: 0
+                }},
+                rectangle: boundary
+            }) ) {
+                player.velocity.y = 0
+                break
+            } else {
+                player.velocity.x = -5
+            }
+        }
+    } else if (keys.s.pressed && lastkey === 's') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i]
+            if (
+                circleCollidesWithRectangle({
+                circle: {
+                    ...player, 
+                    velocity: {
+                    x: 0,
+                    y: 5
+                }},
+                rectangle: boundary
+            }) ) {
+                player.velocity.y = 0
+                break
+            } else {
+                player.velocity.y = 5
+            }
+        }
+    } else if (keys.d.pressed && lastkey === 'd') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i]
+            if (
+                circleCollidesWithRectangle({
+                circle: {
+                    ...player, 
+                    velocity: {
+                    x: 5,
+                    y: 0
+                }},
+                rectangle: boundary
+            }) ) {
+                player.velocity.y = 0
+                break
+            } else {
+                player.velocity.y = -5
+            }
+        }
+    }
+
    boundaries.forEach((boundary) => {
          boundary.draw()
+
+         if (
+            circleCollidesWithRectangle({
+                circle: player,
+                rectangle: boundary
+            }) 
+        ){
+        player.velocity.x = 0
+        player.velocity.y = 0
+    }
     })
 
     player.update()
-    player.velocity.y = 0
+    // player.velocity.x = 0
+    // player.velocity.y = 0
 
-    if (keys.w.pressed && lastkey === 'w') {
-        player.velocity.y = -5
-    } else if (keys.a.pressed && lastkey === 'a') {
-        player.velocity.y = -5
-    } else if (keys.s.pressed && lastkey === 's') {
-        player.velocity.y = 5
-    } else if (keys.d.pressed && lastkey === 'd') {
-        player.velocity.y = 5
-    }
+    
 }
 
 animate()
